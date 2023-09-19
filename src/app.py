@@ -3,7 +3,7 @@
 from flask import Flask
 from redbeat import RedBeatSchedulerEntry as Entry
 from redis import Redis
-
+from bleach import clean
 import tasks.tasks as t
 
 app = Flask(__name__)
@@ -22,11 +22,13 @@ def hello():
 
 
 @app.route('/stop/<id>')
-def goodbye(id: int):
-    e = Entry.from_key(f'redbeat:task{id}', app=t.app)
+def goodbye(id: str):
+    clean_id = clean(id)
+
+    e = Entry.from_key(f'redbeat:task{clean_id}', app=t.app)
     e.delete()
 
-    return f"Task task{id} has been deleted."
+    return f"Task task{clean_id} has been deleted."
 
 
 if __name__ == "__main__":

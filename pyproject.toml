@@ -12,10 +12,12 @@ celery = {extras = ["redis"], version = "^5.3.4"}
 flask = "^2.3.3"
 flower = "^2.0.1"
 celery-redbeat = "^2.1.1"
+bleach = "^6.0.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
 types-redis = "^4.6.0.6"
+types-bleach = "^6.0.0.4"
 
 [build-system]
 requires = ["poetry-core"]
