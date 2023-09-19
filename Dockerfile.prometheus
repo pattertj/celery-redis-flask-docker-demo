@@ -1,0 +1,11 @@
+# Use a base Prometheus image
+FROM prom/prometheus
+
+# Copy your prometheus.yml configuration file to the container
+COPY /src/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
+
+# Expose the Prometheus web UI and API port
+EXPOSE 9090
+
+# Start Prometheus with the custom configuration
+CMD ["--config.file=/etc/prometheus/prometheus.yml"]

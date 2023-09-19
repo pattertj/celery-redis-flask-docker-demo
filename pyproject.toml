@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redbeat-demo"
-version = "1.0.0"
+version = "1.1.0"
 description = "A sample project on how to organize, build, and deploy Celery, Beat, Flower, Redis, and Flask on Docker."
 authors = ["Tyler Patterson <pattertj@duck.com>"]
 readme = "README.md"

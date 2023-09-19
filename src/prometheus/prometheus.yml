@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'flower'
+    static_configs:
+      - targets: ['flower:5555']  # Replace with your Celery Flower service name and port

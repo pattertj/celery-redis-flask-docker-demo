@@ -64,6 +64,22 @@ services:
     networks:
       - default
 
+  prometheus:
+    build:
+      context: .  # The Dockerfile is in the current directory
+      dockerfile: Dockerfile.prometheus  # Use the Dockerfile for Prometheus
+    ports:
+      - '${PROMETHEUS_PORT}:${PROMETHEUS_PORT}'  # Expose Prometheus web UI and API port
+    networks:
+      - default
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '${GRAFANA_PORT}:${GRAFANA_PORT}'  # Expose Grafana web UI port
+    networks:
+      - default
+
 networks:
   default:
     driver: bridge
