@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    command: celery -A app.tasks.tasks worker --loglevel=INFO --autoscale=10,1
+    stop_signal: SIGINT
+    depends_on:
+      - redis
+    networks:
+      - default
+  
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    command: celery -A app.tasks.tasks beat -S redbeat.RedBeatScheduler --loglevel=INFO
+    stop_signal: SIGINT
+    depends_on:
+      - redis
+    networks:
+      - default
+  
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    command: celery -A app.tasks.tasks flower --loglevel=WARNING --port=5555
+    ports:
+      - 5555:5555
+    depends_on:
+      - redis
+      - worker
+    networks:
+      - default
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    networks:
+      - default
+
+  flask_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask  # Create a separate Dockerfile for Flask
+    stop_signal: SIGINT
+    ports:
+      - '8000:8000'
+    depends_on:
+      - redis
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "redbeat-demo"
+version = "0.1.0"
+description = ""
+authors = ["Tyler Patterson <pattertj@duck.com>"]
+readme = "README.md"
+packages = [{include = "redbeat_demo"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+celery = {extras = ["redis"], version = "^5.3.4"}
+flask = "^2.3.3"
+flower = "^2.0.1"
+celery-redbeat = "^2.1.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.4.1"
+types-redis = "^4.6.0.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
