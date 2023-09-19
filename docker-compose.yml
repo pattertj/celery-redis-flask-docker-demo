@@ -1,35 +1,41 @@
 version: '3.8'
 services:
-  
+
   worker:
     build:
       context: .
       dockerfile: Dockerfile.celery
-    command: celery -A app.tasks.tasks worker --loglevel=INFO --autoscale=10,1
+    command: celery -A app.tasks.tasks worker --loglevel=INFO
+    env_file:
+      - .env
     stop_signal: SIGINT
     depends_on:
       - redis
     networks:
       - default
-  
+
   beat:
     build:
       context: .
       dockerfile: Dockerfile.celery
     command: celery -A app.tasks.tasks beat -S redbeat.RedBeatScheduler --loglevel=INFO
+    env_file:
+      - .env
     stop_signal: SIGINT
     depends_on:
       - redis
     networks:
       - default
-  
+
   flower:
     build:
       context: .
       dockerfile: Dockerfile.celery
-    command: celery -A app.tasks.tasks flower --loglevel=WARNING --port=5555
+    command: celery -A app.tasks.tasks flower --loglevel=INFO --port=${FLOWER_PORT}
+    env_file:
+      - .env
     ports:
-      - 5555:5555
+      - "${FLOWER_PORT}:${FLOWER_PORT}"
     depends_on:
       - redis
       - worker
@@ -39,7 +45,7 @@ services:
   redis:
     image: "redis:latest"
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - default
 
@@ -47,9 +53,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.flask  # Create a separate Dockerfile for Flask
+    command: ["python3", "app/app.py"]
     stop_signal: SIGINT
+    env_file:
+      - .env
     ports:
-      - '8000:8000'
+      - '${FLASK_RUN_PORT}:${FLASK_RUN_PORT}'
     depends_on:
       - redis
     networks:

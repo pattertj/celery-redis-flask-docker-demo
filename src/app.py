@@ -1,35 +1,58 @@
-# import json
-# import random
-from flask import Flask
+"""The main Flask API."""
+
+import os
+
+from bleach import clean
+from dotenv import load_dotenv
+from flask import Flask, Response, jsonify, make_response
 from redbeat import RedBeatSchedulerEntry as Entry
 from redis import Redis
-from bleach import clean
+
 import tasks.tasks as t
 
+load_dotenv()
+
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+
+FLASK_RUN_PORT = int(os.getenv("FLASK_RUN_PORT", 8000))
+FLASK_RUN_HOST = os.getenv("FLASK_RUN_HOST", "127.0.0.1")
+
 app = Flask(__name__)
-redis = Redis(host='redis', port=6379)
+redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 
-@app.route('/')
-def hello():
-    redis.incr('hits')
-    counter = str(redis.get('hits'), 'utf-8')
+@app.route("/")
+def hello() -> Response:
+    """Start a new task."""
+    counter = redis.incr("hits")
 
-    entry = Entry(f'task{counter}', 'app.tasks.tasks.my_background_task', .1, app=t.app)
+    # Run a task named task{counter} every .5 second and save it.
+    entry = Entry(
+        f"task{counter}", "app.tasks.tasks.my_background_task", 0.5, app=t.app
+    )
     entry.save()
+    return make_response(f"This webpage has been viewed {counter} time(s)", 200)
 
-    return f"This webpage has been viewed {counter} time(s)"
 
-
-@app.route('/stop/<id>')
+@app.route("/stop/<id>")
 def goodbye(id: str):
+    """Stop a given task ID.
+
+    Args:
+        id (str): Task ID
+    """
     clean_id = clean(id)
 
-    e = Entry.from_key(f'redbeat:task{clean_id}', app=t.app)
-    e.delete()
+    try:
+        e = Entry.from_key(f"redbeat:task{clean_id}", app=t.app)
+        e.delete()
+    except KeyError as e:
+        response = {"error": f"KeyError: {str(e)}"}
+        return make_response(jsonify(response), 500)
 
-    return f"Task task{clean_id} has been deleted."
+    return make_response(f"Task task{clean_id} has been deleted.", 200)
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host=FLASK_RUN_HOST, port=FLASK_RUN_PORT)

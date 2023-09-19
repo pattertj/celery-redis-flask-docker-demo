@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "redbeat-demo"
-version = "0.1.0"
-description = ""
+version = "1.0.0"
+description = "A sample project on how to organize, build, and deploy Celery, Beat, Flower, Redis, and Flask on Docker."
 authors = ["Tyler Patterson <pattertj@duck.com>"]
 readme = "README.md"
 packages = [{include = "redbeat_demo"}]
@@ -13,11 +13,17 @@ flask = "^2.3.3"
 flower = "^2.0.1"
 celery-redbeat = "^2.1.1"
 bleach = "^6.0.0"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
 types-redis = "^4.6.0.6"
 types-bleach = "^6.0.0.4"
+flake8 = "^6.1.0"
+deptry = "^0.12.0"
+pre-commit = "^3.3.3"
+bandit = "^1.7.5"
+pydocstyle = "^6.3.0"
 
 [build-system]
 requires = ["poetry-core"]
