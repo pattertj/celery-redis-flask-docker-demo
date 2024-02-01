@@ -1,5 +1,5 @@
 # Use the official Python image as a parent image
-FROM python:3.11-slim as builder
+FROM python:3.13.0a3-slim as builder
 
 # Set the working directory inside the container
 RUN pip install poetry
@@ -20,7 +20,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 # The runtime image, used to just run the code provided its virtual environment
-FROM python:3.11-slim as runtime
+FROM python:3.13.0a3-slim as runtime
 
 # Set environment variables
 ENV VIRTUAL_ENV=/app/.venv \
